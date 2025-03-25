@@ -1,13 +1,16 @@
 import { Hono } from "hono";
-import { logInWithUsernameAndPassword, signUpWithUsernameAndPassword } from "../contoller/authentication";
+import {
+  logInWithUsernameAndPassword,
+  signUpWithUsernameAndPassword,
+} from "../contoller/authentication/authentication-controller";
 import {
   LogInWtihUsernameAndPasswordError,
   SignUpWithUsernameAndPasswordError,
-} from "../contoller/authentication/+type";
+} from "../contoller/authentication/authentication-types";
 
-export const hono = new Hono();
+export const authenticationRoutes = new Hono();
 
-hono.post("/authentication/sign-up", async (context) => {
+authenticationRoutes.post("/sign-up", async (context) => {
   const { username, password } = await context.req.json();
 
   try {
@@ -41,7 +44,7 @@ hono.post("/authentication/sign-up", async (context) => {
   }
 });
 
-hono.post("/authentication/log-in", async (context) => {
+authenticationRoutes.post("/log-in", async (context) => {
   try {
     const { username, password } = await context.req.json();
 
@@ -57,6 +60,8 @@ hono.post("/authentication/log-in", async (context) => {
       201
     );
   } catch (e) {
+    console.log("Error", e);
+
     if (e === LogInWtihUsernameAndPasswordError.INCORRECT_USERNAME_OR_PASSWORD) {
       return context.json(
         {
@@ -74,12 +79,4 @@ hono.post("/authentication/log-in", async (context) => {
     );
   }
 });
-
-hono.get("/health", (context) => {
-  return context.json(
-    {
-      message: "All Ok",
-    },
-    200
-  );
-});
+export const hono = new Hono();
